@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaArrowLeft } from 'react-icons/fa'; 
+import { FaArrowLeft } from 'react-icons/fa';
 
 const MyAccount = () => {
   const [profile, setProfile] = useState({ fullName: '', email: '' });
@@ -8,28 +8,28 @@ const MyAccount = () => {
   const [error, setError] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('token'); 
+    const fetchProfile = async () => {
       const config = {
-        headers: {
-        },
-        withCredentials: true 
+        headers: {},
+        withCredentials: true
       };
 
-
       try {
-        setLoading(true); 
-        const res = await axios.get('http://localhost:8000/apis/lost-and-found/MyAccount/getprofile', config);
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/MyAccount/getprofile`,
+          config
+        );
         setProfile(res.data);
-        setError(''); 
+        setError('');
       } catch (err) {
-        console.error("Error fetching profile:", err);
         if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-            setError('Session expired or not authenticated. Please log in again.');
+          setError('Session expired or not authenticated. Please log in again.');
         } else {
-            setError(err.response?.data?.message || 'Failed to load profile. Please try again.');
+          setError(err.response?.data?.message || 'Failed to load profile. Please try again.');
         }
       } finally {
         setLoading(false);
@@ -37,10 +37,11 @@ const MyAccount = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, []);
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setPasswordMessage(''); 
+    setPasswordMessage('');
 
     if (!oldPassword || !newPassword) {
       setPasswordMessage('Both password fields are required.');
@@ -52,16 +53,14 @@ const MyAccount = () => {
       return;
     }
 
-    const token = localStorage.getItem('token');
     const config = {
-      headers: {
-      },
-      withCredentials: true 
+      headers: {},
+      withCredentials: true
     };
 
     try {
       const res = await axios.post(
-        'http://localhost:8000/apis/lost-and-found/MyAccount/change-password',
+        `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/MyAccount/change-password`,
         { oldPassword, newPassword },
         config
       );
@@ -69,16 +68,14 @@ const MyAccount = () => {
       setOldPassword('');
       setNewPassword('');
     } catch (err) {
-      console.error("Error changing password:", err);
       setPasswordMessage(err.response?.data?.message || 'Password update failed. Please try again.');
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 relative">
-      {}
       <a
-        href="/" 
+        href="/"
         className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center text-blue-600 hover:text-blue-800 transition duration-200"
       >
         <FaArrowLeft className="mr-2" /> Back to Home
@@ -102,7 +99,6 @@ const MyAccount = () => {
 
           {!loading && !error && (
             <>
-              {}
               <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
                 <h2 className="text-xl font-semibold mb-3 text-gray-800 flex items-center">
                   <span className="mr-2 text-blue-500">
@@ -118,7 +114,6 @@ const MyAccount = () => {
                 </div>
               </div>
 
-              {}
               <form onSubmit={handleChangePassword} className="bg-gray-50 rounded-lg p-5 border border-gray-200 space-y-4">
                 <h2 className="text-xl font-semibold text-gray-800 flex items-center">
                   <span className="mr-2 text-blue-500">
