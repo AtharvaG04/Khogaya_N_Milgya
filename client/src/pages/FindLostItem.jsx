@@ -155,7 +155,7 @@ const handleSuggestionClick = (value) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8000/apis/lost-and-found/object-query/report-lost', formData, config);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/object-query/report-lost`, formData, config);
       setMessage(response.data.message || 'Lost item reported successfully!');
       setObjectName('');
       setObjectDescription('');
