@@ -3,8 +3,7 @@ import { io } from 'socket.io-client';
 import { Send, X, Loader } from 'lucide-react';
 import axios from 'axios';
 
-// Initialize socket connection
-const socket = io('http://localhost:8000', {
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
     withCredentials: true
 });
 
@@ -16,69 +15,51 @@ const ChatModal = ({ currentUserId, chatPartner, onClose }) => {
     const [error, setError] = useState(null);
     const messagesEndRef = useRef(null);
 
-    // Helper function to scroll to the latest message
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Effect for establishing the chat room and fetching initial history
     useEffect(() => {
         const establishChatRoom = async () => {
             setIsLoading(true);
             setError(null);
-            
-            // --- CORRECTED LOGIC START ---
             try {
-                // This API call now always returns a roomId on success (status 200 or 201).
-                // It no longer throws a 409 error.
                 const response = await axios.post(
-                    'http://localhost:8000/apis/lost-and-found/chat/room',
+                    `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/chat/room`,
                     { otherUserId: chatPartner.id },
                     { withCredentials: true }
                 );
-
                 const fetchedRoomId = response.data.roomId;
                 setRoomId(fetchedRoomId);
-
-                // Join the socket room to listen for live messages
                 socket.emit('joinRoom', fetchedRoomId);
-
-                // Once the room is established, fetch the chat history
                 const historyResponse = await axios.get(
-                    `http://localhost:8000/apis/lost-and-found/chat/history/${fetchedRoomId}`,
+                    `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/chat/history/${fetchedRoomId}`,
                     { withCredentials: true }
                 );
                 setMessages(historyResponse.data);
-
             } catch (err) {
-                // This catch block now only handles genuine server errors (e.g., status 500)
                 console.error('Error establishing chat room or fetching history:', err);
                 setError('Could not load chat. Please try again later.');
             } finally {
                 setIsLoading(false);
             }
-            // --- CORRECTED LOGIC END ---
         };
 
         if (currentUserId && chatPartner && chatPartner.id) {
             establishChatRoom();
         }
 
-        // Cleanup function to leave the socket room when the modal is closed or chat partner changes
         return () => {
             if (roomId) {
                 socket.emit('leaveRoom', roomId);
             }
         };
-    }, [currentUserId, chatPartner, roomId]); // Added roomId to dependencies for the cleanup function
+    }, [currentUserId, chatPartner, roomId]);
 
-    // Effect for handling incoming new messages from the socket
     useEffect(() => {
         const handleNewMessage = (newMessage) => {
-            // Ensure the message belongs to the current open chat room
             if (newMessage.chatRoom === roomId) {
                 setMessages((prevMessages) => {
-                    // Prevent duplicate messages from being added to the state
                     const isDuplicate = prevMessages.some(msg => msg._id === newMessage._id);
                     return isDuplicate ? prevMessages : [...prevMessages, newMessage];
                 });
@@ -87,37 +68,31 @@ const ChatModal = ({ currentUserId, chatPartner, onClose }) => {
 
         socket.on('newMessage', handleNewMessage);
 
-        // Cleanup the event listener when the component unmounts or roomId changes
         return () => {
             socket.off('newMessage', handleNewMessage);
         };
-    }, [roomId]); // This effect depends only on the roomId
+    }, [roomId]);
 
-    // Effect to scroll down whenever the messages array is updated
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
-    // Function to handle sending a new message
     const handleSendMessage = async () => {
         if (inputMessage.trim() && roomId) {
             try {
-                // The message is sent via API to be saved in the DB
-                // The server will then emit it via socket to the room
                 await axios.post(
-                    'http://localhost:8000/apis/lost-and-found/chat/message',
+                    `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/chat/message`,
                     { roomId, message: inputMessage.trim() },
                     { withCredentials: true }
                 );
                 setInputMessage('');
             } catch (err) {
                 console.error('Error sending message:', err);
-                setError('Failed to send message.'); // Optionally show a temporary error
+                setError('Failed to send message.');
             }
         }
     };
 
-    // Handle sending message on "Enter" key press
     const handleKeyPress = (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
@@ -140,7 +115,6 @@ const ChatModal = ({ currentUserId, chatPartner, onClose }) => {
                     </button>
                 </header>
 
-                {/* Main Chat Body */}
                 <div className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full text-gray-500">
@@ -177,7 +151,6 @@ const ChatModal = ({ currentUserId, chatPartner, onClose }) => {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Chat Input Footer */}
                 <footer className="p-4 border-t border-gray-200">
                     <div className="flex items-center space-x-2">
                         <input
