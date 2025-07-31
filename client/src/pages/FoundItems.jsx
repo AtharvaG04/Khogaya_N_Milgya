@@ -26,10 +26,11 @@ const FoundItems = () => {
       };
 
       try {
-        const response = await axios.get(
-          "http://localhost:8000/apis/lost-and-found/my-items/my-found-items",
-          config
-        );
+       const response = await axios.get(
+       `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/my-items/my-found-items`,
+        config
+       );
+
         setFoundItems(response.data.foundItems);
       } catch (err) {
         console.error("Error fetching found items:", err);
