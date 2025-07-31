@@ -106,9 +106,11 @@ const ResultsPage = () => {
     try {
       setLoading(true);
       // Using localhost as requested
-      const response = await axios.get('http://localhost:8000/apis/lost-and-found/results/', {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+  `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/results/`,
+  { withCredentials: true }
+);
+
 
       CURRENT_USER_ID = response.data.userId;
       setMatches(response.data.matches || []);
@@ -155,7 +157,7 @@ const ResultsPage = () => {
     setActionLoading(prev => ({ ...prev, [resultId]: true }));
     try {
       let response;
-      const API_BASE_URL = 'http://localhost:8000/apis/lost-and-found/results';
+      const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/results`;
       switch (action) {
         case 'confirm':
           response = await axios.patch(`${API_BASE_URL}/${resultId}/confirm`, {}, { withCredentials: true });
