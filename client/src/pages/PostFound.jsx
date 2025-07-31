@@ -138,9 +138,10 @@ const PostFoundPage = () => {
     formData.append('dateFound', dateFound);
 
     try {
-      await axios.post('http://localhost:8000/apis/lost-and-found/object-query/report-found', formData, {
-        withCredentials: true,
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/object-query/report-found`, formData, {
+      withCredentials: true,
       });
+
 
       setItemTitle('');
       setItemDescription('');
