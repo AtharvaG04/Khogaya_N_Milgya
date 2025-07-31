@@ -27,9 +27,10 @@ const ReceivedItems = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:8000/apis/lost-and-found/my-items/my-lost-items",
+        `${import.meta.env.VITE_BACKEND_URL}/apis/lost-and-found/my-items/my-lost-items`,
           config
-        );
+          );
+
 
         setReceivedItems(response.data.lostItems);
       } catch (err) {
