@@ -37,7 +37,7 @@ const io = new Server(server, {
 app.set('socketio', io);
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://khogaya-n-milgya-jv4yb6yt9-atharva-gujarthis-projects.vercel.app/',
     methods: ['GET', 'POST', 'OPTIONS', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
