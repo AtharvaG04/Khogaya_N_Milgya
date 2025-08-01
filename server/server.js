@@ -26,9 +26,11 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 9000;
 
+const allowedOrigin = 'https://khogaya-n-milgya-jv4yb6yt9-atharva-gujarthis-projects.vercel.app';
+
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: allowedOrigin,
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -37,7 +39,7 @@ const io = new Server(server, {
 app.set('socketio', io);
 
 app.use(cors({
-    origin: 'https://khogaya-n-milgya-jv4yb6yt9-atharva-gujarthis-projects.vercel.app/',
+    origin: allowedOrigin,
     methods: ['GET', 'POST', 'OPTIONS', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
